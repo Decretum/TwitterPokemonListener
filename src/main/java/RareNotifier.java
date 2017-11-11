@@ -36,7 +36,7 @@ public class RareNotifier {
                     results.removeAll(alreadyFound);
                     alreadyFound.addAll(results);
                     results.forEach(info -> {
-                        if (info.contains("Unown")) {
+                        if (info != null && info.contains("Unown")) {
                             SwingTest.showNotification(info, 1);
                         } else {
                             SwingTest.showNotification(info, 0);
