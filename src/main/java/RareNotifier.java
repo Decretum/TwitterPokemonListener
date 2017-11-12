@@ -8,6 +8,8 @@ public class RareNotifier {
 
     private static String[] wantedCities = {"Fremont:", "Milpitas:", "Hayward:", "Newark:", "Union C:"};
     private static String[] feeds = {"https://twitter.com/AlamedaRareMons"};
+
+    private static WebDriver driver;
 //    private static String[] feeds = {"https://twitter.com/AlamedaUltraMon"};
 //    private static String[] feeds = {"https://twitter.com/AlamedaMons"}; // 100 IV mons
 //    private static String[] feeds = {"https://twitter.com/AlamedaUnowns"};
@@ -17,7 +19,7 @@ public class RareNotifier {
 
         System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
 
-        WebDriver driver = new ChromeDriver();
+        driver = new ChromeDriver();
 
         while (true) {
             driver.get(feeds[0]);
@@ -46,6 +48,10 @@ public class RareNotifier {
             }
             Thread.sleep(15000);
         }
+    }
+
+    public static void closeBrowser() {
+        driver.close();
     }
 
     private static Set<String> parseInfo(String source, String[] cities) {

@@ -26,6 +26,7 @@ public class SwingTest {
         yes.addActionListener(ae -> {
             System.out.println("yes");
             clip.stop();
+            RareNotifier.closeBrowser();
             System.exit(0);
         });
         no.addActionListener(ae -> {
