@@ -88,8 +88,14 @@ public class RareNotifier {
         for (String city : cities) {
             if (tweet.contains(city)) {
                 String result = city;
-                tweet = tweet.split("<a href=")[0];
-                tweet = tweet.split(" sign\" />")[1];
+                if (tweet.contains(" sign\" />")) {
+                    tweet = tweet.split("<a href=")[0];
+                    tweet = tweet.split(" sign\" />")[1];
+                } else {
+                    // Without this check, genderless Pokemon like Unown crash the program lmao
+                    tweet = tweet.split("<a href=")[0];
+                    tweet = tweet.split(city + " ")[1];
+                }
                 System.out.println("DEBUG: " + tweet);
                 result = result + tweet;
                 return result;
