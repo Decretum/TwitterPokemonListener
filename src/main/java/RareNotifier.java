@@ -49,14 +49,16 @@ public class RareNotifier {
                     results.removeAll(alreadyFound);
                     alreadyFound.addAll(results);
                     results.forEach(info -> {
-                        if (info != null && info.contains("Unown")) {
-                            SwingTest.showNotification(info, 1);
-                        } else {
-                            SwingTest.showNotification(info, 0);
-                        }
-                        if (sendTexts) {
-                            Message message = Message.creator(new PhoneNumber(RECEIVER_NUMBER), new PhoneNumber(TWILIO_NUMBER), info).create();
-                            System.out.println("DEBUG: Sent a text message for " + info);
+                        if (info != null) {
+                            if (info.contains("Unown")) {
+                                SwingTest.showNotification(info, 1);
+                            } else {
+                                SwingTest.showNotification(info, 0);
+                            }
+                            if (sendTexts) {
+                                Message message = Message.creator(new PhoneNumber(RECEIVER_NUMBER), new PhoneNumber(TWILIO_NUMBER), info).create();
+                                System.out.println("DEBUG: Sent a text message for " + info);
+                            }
                         }
                     });
                 }
