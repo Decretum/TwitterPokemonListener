@@ -1,6 +1,10 @@
 import java.util.HashSet;
 import java.util.Set;
 
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
@@ -15,10 +19,17 @@ public class RareNotifier {
 //    private static String[] feeds = {"https://twitter.com/AlamedaUnowns"};
 
     public static void main(String[] args) throws Exception {
+        boolean sendTexts = true;
+        String ACCOUNT_SID = "AC14ba3ae443a97034d8dfe5cccf3138f0";
+        String AUTH_TOKEN = "de68549b4b6cc5b3cab1fdf99bad70e3";
+        String RECEIVER_NUMBER = "+15105574226";
+        String TWILIO_NUMBER = "+15106069380";
         HashSet<String> alreadyFound = new HashSet<>();
-
         System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
 
+        if (sendTexts) {
+            Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
+        }
         driver = new ChromeDriver();
 
         while (true) {
@@ -42,6 +53,10 @@ public class RareNotifier {
                             SwingTest.showNotification(info, 1);
                         } else {
                             SwingTest.showNotification(info, 0);
+                        }
+                        if (sendTexts) {
+                            Message message = Message.creator(new PhoneNumber(RECEIVER_NUMBER), new PhoneNumber(TWILIO_NUMBER), info).create();
+                            System.out.println("DEBUG: Sent a text message for " + info);
                         }
                     });
                 }
