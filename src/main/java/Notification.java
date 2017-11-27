@@ -6,16 +6,20 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 
-public class SwingTest {
+public class Notification {
 
     private Clip clip;
     private JFrame jfrm;
     private static String soundFile;
 
-    public SwingTest(String text) throws Exception {
-        jfrm = new JFrame("Testing");
+    public Notification(String text) throws Exception {
+        jfrm = new JFrame("Trainer Alert");
         jfrm.setLayout(new GridLayout(2, 1, 1, 1));
-        jfrm.add(new JTextArea(text));
+        JTextArea body = new JTextArea(text);
+        body.setLineWrap(true);
+        body.setWrapStyleWord(true);
+        body.setEditable(false);
+        jfrm.add(body);
         JPanel jp = new JPanel();
         jp.setLayout(new GridLayout(3, 6, 1, 1));
         for (int x = 0; x < 7; x++) {
@@ -60,7 +64,7 @@ public class SwingTest {
         }
         SwingUtilities.invokeLater(() -> {
             try {
-                new SwingTest(text);
+                new Notification(text);
             } catch (Exception e) {
                 // I really don't care.
                 e.printStackTrace();
@@ -71,7 +75,7 @@ public class SwingTest {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
-                new SwingTest("testing");
+                new Notification("testing");
             } catch (Exception e) {
                 e.printStackTrace();
             }

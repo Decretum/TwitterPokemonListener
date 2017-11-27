@@ -10,30 +10,32 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 public class RareNotifier {
 
-    private static String[] wantedCities = {"Fremont:", "Milpitas:", "Hayward:", "Newark:", "Union C:"};
-    private static String[] feeds = {"https://twitter.com/AlamedaRareMons"};
+    private static String[] wantedCities = {"Fremont", "Milpitas", "Hayward", "Newark", "Union C"};
+    private static String feedUrl = "https://twitter.com/AlamedaRareMons";
+    private static boolean showPopup = true;
+    private static boolean sendTexts = false;
+    private static String RECEIVER_NUMBER = "+15105574226";
+    private static String TWILIO_NUMBER = "+15106069380";
+    private static String ACCOUNT_SID = "";
+    private static String AUTH_TOKEN = "";
+    private static HashSet<String> alreadyFound = new HashSet<>();
 
     private static WebDriver driver;
-//    private static String[] feeds = {"https://twitter.com/AlamedaUltraMon"};
-//    private static String[] feeds = {"https://twitter.com/AlamedaMons"}; // 100 IV mons
-//    private static String[] feeds = {"https://twitter.com/AlamedaUnowns"};
 
     public static void main(String[] args) throws Exception {
-        boolean sendTexts = true;
-        String ACCOUNT_SID = "AC14ba3ae443a97034d8dfe5cccf3138f0";
-        String AUTH_TOKEN = "de68549b4b6cc5b3cab1fdf99bad70e3";
-        String RECEIVER_NUMBER = "+15105574226";
-        String TWILIO_NUMBER = "+15106069380";
-        HashSet<String> alreadyFound = new HashSet<>();
         System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
 
-        if (sendTexts) {
-            Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
-        }
+        Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
         driver = new ChromeDriver();
 
+        String citiesString = "";
+        for (String city : wantedCities) {
+            citiesString += city + "\n";
+        }
+        Config.showConfig(feedUrl, citiesString, RECEIVER_NUMBER, showPopup, sendTexts);
+
         while (true) {
-            driver.get(feeds[0]);
+            driver.get(feedUrl);
             String source = driver.getPageSource();
             boolean notable = false;
             for (String city : wantedCities) {
@@ -50,13 +52,15 @@ public class RareNotifier {
                     alreadyFound.addAll(results);
                     results.forEach(info -> {
                         if (info != null) {
-                            if (info.contains("Unown")) {
-                                SwingTest.showNotification(info, 1);
-                            } else {
-                                SwingTest.showNotification(info, 0);
+                            if (showPopup) {
+                                if (info.contains("Unown")) {
+                                    Notification.showNotification(info, 1);
+                                } else {
+                                    Notification.showNotification(info, 0);
+                                }
                             }
                             if (sendTexts) {
-                                Message message = Message.creator(new PhoneNumber(RECEIVER_NUMBER), new PhoneNumber(TWILIO_NUMBER), info).create();
+                                Message.creator(new PhoneNumber(RECEIVER_NUMBER), new PhoneNumber(TWILIO_NUMBER), info).create();
                                 System.out.println("DEBUG: Sent a text message for " + info);
                             }
                         }
@@ -82,12 +86,13 @@ public class RareNotifier {
         return results;
     }
 
-    private static String parseInfoFromTweet(String tweet, String[] cities) {
+    private static String parseInfoFromTweet(String originalTweet, String[] cities) {
         // If the tweet has a city listed, return some information about it.
         // Otherwise return null.
         for (String city : cities) {
-            if (tweet.contains(city)) {
+            if ((!city.equals("")) && originalTweet.contains(city)) {
                 String result = city;
+                String tweet = new String(originalTweet);
                 if (tweet.contains(" sign\" />")) {
                     tweet = tweet.split("<a href=")[0];
                     tweet = tweet.split(" sign\" />")[1];
@@ -97,11 +102,25 @@ public class RareNotifier {
                     tweet = tweet.split(city + " ")[1];
                 }
                 System.out.println("DEBUG: " + tweet);
-                result = result + tweet;
-                return result;
+                result = result + " " + tweet;
+                return result + " " + parseGoogleMapsUrlFromTweet(originalTweet);
             }
         }
         return null;
+    }
+
+    private static String parseGoogleMapsUrlFromTweet(String tweet) {
+        tweet = tweet.split("target=\"_blank\" title=\"")[1];
+        tweet = tweet.split("\"")[0];
+        return tweet;
+    }
+
+    public static void updateSettings(String feed, String cities, String receiver, boolean showNotifications, boolean sendMessages) {
+        feedUrl = feed;
+        RECEIVER_NUMBER = receiver;
+        showPopup = showNotifications;
+        sendTexts = sendMessages;
+        wantedCities = cities.split("\n");
     }
 
 }
